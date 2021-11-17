@@ -1,0 +1,17 @@
+{
+  "name": "agileware-child-theme-utilities",
+  "version": "1.5.0",
+  "description": "Agileware Child Theme Utilities",
+  "main": "build/current-menu-block.js",
+  "scripts": {
+    "build": "wp-scripts build src/current-menu-block",
+    "build:dev": "wp-scripts build --mode=development --devtool=eval-source-map src/current-menu-block"
+  },
+  "author": "Agileware",
+  "license": "GPL-2.0-only",
+  "devDependencies": {
+    "@wordpress/icons": "^6.1.0",
+    "@wordpress/scripts": "^19.1.0",
+    "@wordpress/server-side-render": "^3.0.7"
+  }
+}

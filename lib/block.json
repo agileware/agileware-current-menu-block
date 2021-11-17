@@ -1,0 +1,37 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "agileware/current-menu",
+  "title": "Current Menu Block",
+  "icon": "menu-alt",
+  "category": "widgets",
+  "description": "Block to show the current level of a given menu.",
+  "keywords": [
+    "menu",
+    "navigation",
+    "links"
+  ],
+  "version": "1.0.0",
+  "textdomain": "default",
+  "attributes": {
+    "navigationMenuId": {
+      "type": "number"
+    },
+    "linkColor": {
+      "type": "string"
+    },
+    "customLinkColor": {
+      "type": "string"
+    },
+    "currentItemColor": {
+      "type": "string"
+    },
+    "customCurrentItemColor": {
+      "type": "string"
+    }
+  },
+  "providesContext": {
+  },
+  "supports": {
+  }
+}
