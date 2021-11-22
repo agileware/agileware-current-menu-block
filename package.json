@@ -1,7 +1,7 @@
 {
-  "name": "agileware-child-theme-utilities",
-  "version": "1.5.0",
-  "description": "Agileware Child Theme Utilities",
+  "name": "agileware-current-menu-block",
+  "version": "1.0.0",
+  "description": "Current Menu Block WordPress plugin by Agileware",
   "main": "build/current-menu-block.js",
   "scripts": {
     "build": "wp-scripts build src/current-menu-block",
