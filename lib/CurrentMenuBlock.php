@@ -110,6 +110,36 @@ class CurrentMenuBlock {
 		return $result;
 	}
 
+	/* Reusable callback to find a current item using a specific query */
+	private function item_search( $items, $queried, $ancestors, $current_url ) {
+		$current_item = false;
+
+		foreach ( $items as $item ) {
+			// First check if the queried item is in the menu
+			if (  // If we have a queried object, find a related menu item
+				( ( $queried instanceof \WP_Post ) && ( $item->object_id == $queried->ID ) ) ||
+				( ( $queried instanceof \WP_Term ) && ( $item->object_id == $queried->term_id ) ) ||
+				// Otherwise, checked if we've exactly matched the URL.
+				( $item->url == $current_url )
+			) {
+				$current_item = $item;
+				break;
+			} elseif ( ( ! $current_item ) && $ancestors ) {
+				// Next, if there's a queried post, check its ancestors, nearest first.
+				foreach ( $ancestors as $anc_id ) {
+					if ( ( $item->object_id == $anc_id ) &&
+					     ( $item->type == ( $queried instanceof \WP_Term ? 'taxonomy' : 'post_type' ) ) ) {
+						$current_item = $item;
+						// Don't break out of this one, as there may be an exact match later.
+					}
+				}
+			}
+		}
+
+		return $current_item;
+	}
+
+
 	/**
 	 * Filter the items in the selected menu according to whether they are:
 	 * 1. for the currently selected DB Object,
@@ -125,19 +155,30 @@ class CurrentMenuBlock {
 	 */
 	public function filter_items( $items, $menu, $args ) {
 		global $wp_query;
-
-		$current_item = false;
+		global $wp;
 
 		$queried = &$wp_query->get_queried_object();
+		$url     = home_url( $wp->request );
+		$terms   = null;
 
-		// If we have a queried object, find a related menu item
-		if ( $queried ) {
-			foreach ( $items as $item ) {
-				if ( $item->object_id == $queried->ID ) {
-					$current_item = $item;
-					break;
-				}
-			}
+		// Get the post ancestors in case we need them
+		if ( $queried instanceof \WP_Post ) {
+			$ancestors  = get_post_ancestors( $queried );
+			$taxonomies = get_object_taxonomies( $queried );
+			$terms      = wp_get_object_terms( $queried->ID, $taxonomies );
+		} elseif ( $queried instanceof \WP_Term ) {
+			$ancestors = get_ancestors( $queried->term_id, $queried->taxonomy );
+		}
+
+		$current_item = $this->item_search( $items, $queried, $ancestors ?? null, $url );
+
+		// Try terms of the queried post if available
+		if ( ( $current_item === false ) && ! empty( $terms ) ) {
+			$current_item = array_reduce(
+				$terms, function ( $current_item, $term ) use ( $items, $url ) {
+				return $current_item ?: $this->item_search( $items, $term, null, $url );
+			},
+				$current_item );
 		}
 
 		// Didn't find anything, exit.
